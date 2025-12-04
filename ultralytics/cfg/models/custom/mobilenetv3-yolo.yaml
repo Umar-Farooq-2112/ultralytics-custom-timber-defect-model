@@ -1,0 +1,63 @@
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
+
+# MobileNetV3-YOLO Custom Model
+# This model uses MobileNetV3 Small as backbone with ultra-lightweight neck
+# and standard YOLOv8n detection head
+
+# Parameters
+nc: 80  # number of classes
+scales:
+  # This model doesn't use scaling since backbone is pretrained MobileNetV3
+  # Channels are fixed: P3=24, P4=40, P5=160 from backbone
+  # Neck outputs: P3=32, P4=48, P5=64
+  n: [1.0, 1.0, 1024]  # dummy values, not used for this architecture
+
+# Custom Backbone + Neck (programmatic - using Python classes)
+# The model is built entirely in Python using:
+# - MobileNetV3BackboneDW (backbone)
+# - UltraLiteNeckDW (neck)
+# - Detect (head)
+
+# This YAML serves as metadata; actual model construction is in custom_models.py
+# To use this model, load it via:
+#   from ultralytics.nn.custom_models import MobileNetV3YOLO
+#   model = MobileNetV3YOLO(nc=80, pretrained=True)
+
+# Architecture Summary:
+# 
+# BACKBONE (MobileNetV3 Small):
+# - Stage 1 (P3/8):  Input -> MobileNetV3[:3]  -> 24 channels
+# - Stage 2 (P4/16): P3    -> MobileNetV3[3:7] -> 40 channels -> DWConv -> 40
+# - Stage 3 (P5/32): P4    -> MobileNetV3[7:]  -> 576 channels -> DWConv -> 160
+#
+# NECK (UltraLiteNeckDW):
+# - P3 path: 24 -> CBAM -> DWConv -> 32 channels
+# - P4 path: 40 -> CBAM -> DWConv -> 48 channels
+# - P5 path: 160 -> SPPF -> Transformer(48) -> CBAM -> DWConv -> 64 channels
+# - Fusion: P5 pooled to P4 size, concat with P4
+#
+# HEAD (YOLOv8n Detect):
+# - Input channels: [32, 48, 64] from [P3, P4, P5]
+# - Standard YOLO detection head with:
+#   - cv2: bbox regression branches
+#   - cv3: classification branches
+#   - DFL: Distribution Focal Loss for boxes
+
+# Equivalent backbone structure (for reference only - not parsed):
+backbone:
+  # MobileNetV3 Small pretrained backbone
+  - [-1, 1, MobileNetV3BackboneDW, [True]]  # pretrained=True
+
+# Equivalent neck structure (for reference only - not parsed):
+neck:
+  - [-1, 1, UltraLiteNeckDW, [[24, 40, 160]]]  # in_channels from backbone
+
+# Equivalent head structure (for reference only - not parsed):
+head:
+  - [[0, 1, 2], 1, Detect, [nc]]  # Detect(P3=32ch, P4=48ch, P5=64ch)
+
+# Model characteristics:
+# - Lightweight: ~1.5M parameters (vs YOLOv8n ~3M)
+# - Fast: Optimized for mobile/edge deployment
+# - Accurate: Combines MobileNetV3 efficiency with YOLO detection
+# - Features: Channel attention + Transformer on P5 + SPPF
