@@ -92,11 +92,16 @@ class MobileNetV3YOLO(nn.Module):
         """Forward pass through the model.
         
         Args:
-            x (torch.Tensor): Input tensor of shape (B, 3, H, W)
+            x (torch.Tensor | dict): Input tensor for inference or batch dict for training
             
         Returns:
-            (torch.Tensor): Detection outputs
+            (torch.Tensor | tuple): Detection outputs or (loss, loss_items) for training
         """
+        # Training mode - if input is dict, compute loss
+        if isinstance(x, dict):
+            return self.loss(x, *args, **kwargs)
+        
+        # Inference mode - standard forward pass
         # Backbone: extract multi-scale features
         feats = self.backbone(x)  # [P3, P4, P5] with channels [24, 40, 160]
         

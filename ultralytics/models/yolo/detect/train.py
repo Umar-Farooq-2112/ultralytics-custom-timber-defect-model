@@ -160,6 +160,9 @@ class DetectionTrainer(BaseTrainer):
         # Try to load custom model first
         custom_model = parse_custom_model(cfg, ch=self.data.get("channels", 3), nc=self.data["nc"], verbose=verbose and RANK == -1)
         if custom_model is not None:
+            # Set model attributes required by the training framework
+            custom_model.args = self.args  # Attach training args for loss calculation
+            custom_model.pt_path = weights  # Attach weights path if provided
             if weights:
                 custom_model.load(weights)
             return custom_model

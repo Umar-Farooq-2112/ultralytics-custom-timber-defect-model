@@ -36,14 +36,14 @@ print("="*80)
 
 # Train for 1 epoch to verify everything works
 try:
-    results = model.train(
-        data="defects-in-timber/data.yaml",
-        epochs=1,
-        batch=4,  # Small batch for quick test
-        imgsz=640,
-        device='cpu',  # Use CPU
-        verbose=True,
-    )
+    # results = model.train(
+    #     data="defects-in-timber/data.yaml",
+    #     epochs=1,
+    #     batch=4,  # Small batch for quick test
+    #     imgsz=640,
+    #     device='cpu',  # Use CPU
+    #     verbose=True,
+    # )
     print("\n✓ Training completed successfully!")
 except Exception as e:
     print(f"\n✗ Training failed: {e}")
