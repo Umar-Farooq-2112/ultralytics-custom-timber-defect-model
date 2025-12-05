@@ -200,6 +200,11 @@ class BaseModel(torch.nn.Module):
         Returns:
             (torch.Tensor): The last output of the model.
         """
+        # Use custom model's forward pass if available
+        if hasattr(self, '_custom_model') and self._custom_model is not None:
+            return self._custom_model(x)
+        
+        # Standard YAML model forward pass
         y, dt, embeddings = [], [], []  # outputs
         embed = frozenset(embed) if embed is not None else {-1}
         max_idx = max(embed)
@@ -421,29 +426,49 @@ class DetectionModel(BaseModel):
         if nc and nc != self.yaml["nc"]:
             LOGGER.info(f"Overriding model.yaml nc={self.yaml['nc']} with nc={nc}")
             self.yaml["nc"] = nc  # override YAML value
-        self.model, self.save = parse_model(deepcopy(self.yaml), ch=ch, verbose=verbose)  # model, savelist
+        
+        # Check if this is a custom model
+        custom_model = parse_custom_model(self.yaml, ch=ch, nc=nc, verbose=verbose)
+        if custom_model is not None:
+            # Use custom model architecture directly (it has its own self.model attribute)
+            # Copy attributes from custom model to self
+            self.model = custom_model.model  # ModuleList with [backbone, neck, detect_head]
+            self.save = []
+            # Copy other important attributes from custom model
+            self.stride = custom_model.stride if hasattr(custom_model, 'stride') else None
+            self.nc = custom_model.nc if hasattr(custom_model, 'nc') else nc
+            # Store reference to full custom model for forward pass
+            self._custom_model = custom_model
+            self._is_custom_model = True
+        else:
+            # Standard YAML-based model
+            self.model, self.save = parse_model(deepcopy(self.yaml), ch=ch, verbose=verbose)  # model, savelist
+            self._custom_model = None
+            self._is_custom_model = False
+        
         self.names = {i: f"{i}" for i in range(self.yaml["nc"])}  # default names dict
         self.inplace = self.yaml.get("inplace", True)
         self.end2end = getattr(self.model[-1], "end2end", False)
 
-        # Build strides
-        m = self.model[-1]  # Detect()
-        if isinstance(m, Detect):  # includes all Detect subclasses like Segment, Pose, OBB, YOLOEDetect, YOLOESegment
-            s = 256  # 2x min stride
-            m.inplace = self.inplace
+        # Build strides (skip for custom models as they handle this themselves)
+        if not self._is_custom_model:
+            m = self.model[-1]  # Detect()
+            if isinstance(m, Detect):  # includes all Detect subclasses like Segment, Pose, OBB, YOLOEDetect, YOLOESegment
+                s = 256  # 2x min stride
+                m.inplace = self.inplace
 
-            def _forward(x):
-                """Perform a forward pass through the model, handling different Detect subclass types accordingly."""
-                if self.end2end:
-                    return self.forward(x)["one2many"]
-                return self.forward(x)[0] if isinstance(m, (Segment, YOLOESegment, Pose, OBB)) else self.forward(x)
+                def _forward(x):
+                    """Perform a forward pass through the model, handling different Detect subclass types accordingly."""
+                    if self.end2end:
+                        return self.forward(x)["one2many"]
+                    return self.forward(x)[0] if isinstance(m, (Segment, YOLOESegment, Pose, OBB)) else self.forward(x)
 
-            self.model.eval()  # Avoid changing batch statistics until training begins
-            m.training = True  # Setting it to True to properly return strides
-            m.stride = torch.tensor([s / x.shape[-2] for x in _forward(torch.zeros(1, ch, s, s))])  # forward
-            self.stride = m.stride
-            self.model.train()  # Set model back to training(default) mode
-            m.bias_init()  # only run once
+                self.model.eval()  # Avoid changing batch statistics until training begins
+                m.training = True  # Setting it to True to properly return strides
+                m.stride = torch.tensor([s / x.shape[-2] for x in _forward(torch.zeros(1, ch, s, s))])  # forward
+                self.stride = m.stride
+                self.model.train()  # Set model back to training(default) mode
+                m.bias_init()  # only run once
         else:
             self.stride = torch.Tensor([32])  # default stride for i.e. RTDETR
 
