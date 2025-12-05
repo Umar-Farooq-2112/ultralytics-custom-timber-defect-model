@@ -406,12 +406,15 @@ class DetectionModel(BaseModel):
         """
         super().__init__()
         self.yaml = cfg if isinstance(cfg, dict) else yaml_model_load(cfg)  # cfg dict
-        if self.yaml["backbone"][0][2] == "Silence":
-            LOGGER.warning(
-                "YOLOv9 `Silence` module is deprecated in favor of torch.nn.Identity. "
-                "Please delete local *.pt file and re-download the latest model checkpoint."
-            )
-            self.yaml["backbone"][0][2] = "nn.Identity"
+        # Check for YOLOv9 Silence module (only for standard YAML format)
+        if "backbone" in self.yaml and isinstance(self.yaml["backbone"], list) and len(self.yaml["backbone"]) > 0:
+            if isinstance(self.yaml["backbone"][0], list) and len(self.yaml["backbone"][0]) > 2:
+                if self.yaml["backbone"][0][2] == "Silence":
+                    LOGGER.warning(
+                        "YOLOv9 `Silence` module is deprecated in favor of torch.nn.Identity. "
+                        "Please delete local *.pt file and re-download the latest model checkpoint."
+                    )
+                    self.yaml["backbone"][0][2] = "nn.Identity"
 
         # Define model
         self.yaml["channels"] = ch  # save channels
