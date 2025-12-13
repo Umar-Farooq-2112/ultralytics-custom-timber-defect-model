@@ -5,7 +5,7 @@
 # and standard YOLOv8n detection head
 
 # Parameters
-nc: 80  # number of classes
+nc: 4  # number of classes
 custom_model: mobilenetv3-yolo  # REQUIRED: identifier for custom model loader
 scales:
   # This model doesn't use scaling since backbone is pretrained MobileNetV3

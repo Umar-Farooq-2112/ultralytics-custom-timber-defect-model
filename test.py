@@ -19,7 +19,7 @@ print(f"   - Number of classes: {model.model.nc}")
 
 # Test forward pass
 print(f"\n3. Testing forward pass...")
-x = torch.randn(1, 3, 640, 640)
+x = torch.randn(1, 3, 320, 320)
 with torch.no_grad():
     outputs = model.model(x)
 

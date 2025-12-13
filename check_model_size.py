@@ -3,7 +3,8 @@
 from ultralytics import YOLO
 
 # Load model
-model = YOLO('ultralytics/cfg/models/custom/mobilenetv3-yolo.yaml')
+# model = YOLO('ultralytics/cfg/models/custom/mobilenetv3-yolo.yaml')
+model = YOLO('best.pt')
 
 # Print model info
 print("\n" + "="*80)

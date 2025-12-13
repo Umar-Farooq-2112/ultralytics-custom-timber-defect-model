@@ -256,7 +256,7 @@ class MobileNetV3BackboneDW(nn.Module):
         p3_base = self.stage1(x)      # 24 channels
         p4_base = self.stage2(p3_base)  # 40 channels  
         p5_base = self.stage3(p4_base)  # 576 channels
-        
+        print("-------- Base Features:", p3_base.shape, p4_base.shape, p5_base.shape)
         # Then enhance each level independently with deeper processing and residuals
         # P3 path - preserve fine details for small defects (5 conv layers + residual)
         p3 = self.conv_p3_1(p3_base)
@@ -267,6 +267,8 @@ class MobileNetV3BackboneDW(nn.Module):
         p3 = p3 + p3_res  # Residual connection
         p3 = self.conv_p3_5(p3)
         p3 = self.cbam_p3(p3)
+        print("-------- P3 :", p3.shape)
+        print("-------- P3 res:", p3_res.shape)
         
         # P4 path - balanced feature extraction (5 conv layers + residual)
         p4 = self.conv_p4_1(p4_base)
@@ -277,7 +279,9 @@ class MobileNetV3BackboneDW(nn.Module):
         p4 = p4 + p4_res  # Residual connection
         p4 = self.conv_p4_5(p4)
         p4 = self.cbam_p4(p4)
-        
+        print("-------- P4 :", p4.shape)
+        print("-------- P4 res:", p4_res.shape)
+
         # P5 path - deep context for large defects (6 conv layers + residual)
         p5 = self.conv_p5_1(p5_base)
         p5 = self.conv_p5_2(p5)
@@ -288,7 +292,10 @@ class MobileNetV3BackboneDW(nn.Module):
         p5 = self.conv_p5_5(p5)
         p5 = self.conv_p5_6(p5)
         p5 = self.cbam_p5(p5)
-        
+
+        print("-------- P5 :", p5.shape)
+        print("-------- P5 res :", p5_res.shape)
+
         return [p3, p4, p5]
 
 
@@ -363,19 +370,19 @@ class UltraLiteNeckDW(nn.Module):
             list: Enhanced and fused features [P3_out, P4_out, P5_out]
         """
         p3, p4, p5 = feats
-
+        print("-------- Neck Input Features:", p3.shape, p4.shape, p5.shape)
         # Initial processing with extra layers
         p3 = self.p3_pre(p3)
         p3 = self.p3_extra1(p3)
         p3 = self.p3_extra2(p3)
         p3 = self.p3_cbam(p3)
-        
+        print("-------- Neck P3 after extra:", p3.shape)
         p4 = self.p4_pre(p4)
         p4 = self.p4_extra1(p4)
         p4 = self.p4_extra2(p4)
         p4 = self.p4_sppf(p4)
         p4 = self.p4_cbam(p4)
-        
+        print("-------- Neck P4 after extra:", p4.shape)    
         p5 = self.p5_pre(p5)
         p5 = self.p5_extra1(p5)
         p5 = self.p5_extra2(p5)
@@ -383,26 +390,29 @@ class UltraLiteNeckDW(nn.Module):
         p5 = self.p5_trans(p5)
         p5 = self.p5_cbam(p5)
         p5 = self.p5_refine(p5)
-        
+        print("-------- Neck P5 after extra:", p5.shape)
         # Top-down fusion (coarse to fine)
         p5_up = nn.functional.interpolate(self.p5_to_p4(p5), size=p4.shape[-2:], mode='nearest')
         p4 = p4 + p5_up
         p4 = self.p4_refine(p4)
-        
+        print("-------- Neck P4 after top-down fusion:", p4.shape)
         p4_up = nn.functional.interpolate(self.p4_to_p3(p4), size=p3.shape[-2:], mode='nearest')
         p3 = p3 + p4_up
         p3 = self.p3_refine(p3)
+        print("-------- Neck P3 after top-down fusion:", p3.shape)
         
         # Bottom-up fusion (fine to coarse) - PAN
         p3_down = self.p3_to_p4(p3)
         p4 = p4 + p3_down
-        
+        print("-------- Neck P4 after bottom-up fusion:", p4.shape)
         p4_down = self.p4_to_p5(p4)
         p5 = p5 + p4_down
-        
+        print("-------- Neck P5 after bottom-up fusion:", p5.shape)
         # Final refinement
         p3_out = self.out_p3(p3)
         p4_out = self.out_p4(p4)
         p5_out = self.out_p5(p5)
-
+        print("-------- Neck P3 final output:", p3_out.shape)
+        print("-------- Neck P4 final output:", p4_out.shape)
+        print("-------- Neck P5 final output:", p5_out.shape)
         return [p3_out, p4_out, p5_out]
