@@ -103,18 +103,13 @@ class MobileNetV3YOLO(nn.Module):
         
         # Inference mode - standard forward pass
         # Backbone: extract multi-scale features
-        print(x.shape)
         feats = self.backbone(x)  # [P3, P4, P5] with channels [24, 40, 160]
-        print([f.shape for f in feats])
         
         # Neck: fuse features
         fused_feats = self.neck(feats)  # [P3, P4, P5] with channels [32, 48, 64]
-        print([f.shape for f in fused_feats])
+
         # Head: generate predictions
         outputs = self.head(fused_feats)
-        print(len(outputs))
-        print([o.shape for o in outputs])
-        print("+++",outputs[0][0].shape)
         return outputs
     
     def loss(self, batch, preds=None):
