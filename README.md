@@ -6,7 +6,7 @@ custom, lightweight **MobileNetV3‑YOLO** model implemented on top of the Ultra
 The goal is that **anyone can understand and reproduce the project using this README alone**.
 
 > Custom model reference implementation (original work):
-> https://github.com/Umar-Farooq-2112/ultralytics-custom-timber-defect-model.git
+> https://github.com/Umar-Farooq-2112/ultralytics-custom-SPPF-transformer-and-CBAM-based-timber-defects-detection.git
 
 ---
 
@@ -435,7 +435,7 @@ that describes the timber defect model.
 For questions about **this timber defect project** (model design, training configuration, or results), please refer to
 the documentation in the `docs/` folder or to the original custom model repository:
 
-- https://github.com/Umar-Farooq-2112/ultralytics-custom-timber-defect-model.git
+- [https://github.com/Umar-Farooq-2112/ultralytics-custom-SPPF-transformer-and-CBAM-based-timber-defects-detection.git](https://github.com/Umar-Farooq-2112/ultralytics-custom-SPPF-transformer-and-CBAM-based-timber-defects-detection.git)
 
 You can also consult the official Ultralytics documentation for general YOLO usage patterns and advanced deployment
 options.
