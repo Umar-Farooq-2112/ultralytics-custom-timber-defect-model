@@ -1,285 +1,442 @@
-<div align="center">
-  <p>
-    <a href="https://www.ultralytics.com/events/yolovision?utm_source=github&utm_medium=org&utm_campaign=yv25_event" target="_blank">
-      <img width="100%" src="https://raw.githubusercontent.com/ultralytics/assets/main/yolov8/banner-yolov8.png" alt="Ultralytics YOLO banner"></a>
-  </p>
+## Timber Defect Localization with MobileNetV3‑YOLO
 
-[中文](https://docs.ultralytics.com/zh/) | [한국어](https://docs.ultralytics.com/ko/) | [日本語](https://docs.ultralytics.com/ja/) | [Русский](https://docs.ultralytics.com/ru/) | [Deutsch](https://docs.ultralytics.com/de/) | [Français](https://docs.ultralytics.com/fr/) | [Español](https://docs.ultralytics.com/es) | [Português](https://docs.ultralytics.com/pt/) | [Türkçe](https://docs.ultralytics.com/tr/) | [Tiếng Việt](https://docs.ultralytics.com/vi/) | [العربية](https://docs.ultralytics.com/ar/) <br>
+This repository contains a **complete object-detection pipeline** for **localizing defects in timber boards** using a
+custom, lightweight **MobileNetV3‑YOLO** model implemented on top of the Ultralytics YOLO framework.
 
-<div>
-    <a href="https://github.com/ultralytics/ultralytics/actions/workflows/ci.yml"><img src="https://github.com/ultralytics/ultralytics/actions/workflows/ci.yml/badge.svg" alt="Ultralytics CI"></a>
-    <a href="https://clickpy.clickhouse.com/dashboard/ultralytics"><img src="https://static.pepy.tech/badge/ultralytics" alt="Ultralytics Downloads"></a>
-    <a href="https://zenodo.org/badge/latestdoi/264818686"><img src="https://zenodo.org/badge/264818686.svg" alt="Ultralytics YOLO Citation"></a>
-    <a href="https://discord.com/invite/ultralytics"><img alt="Ultralytics Discord" src="https://img.shields.io/discord/1089800235347353640?logo=discord&logoColor=white&label=Discord&color=blue"></a>
-    <a href="https://community.ultralytics.com/"><img alt="Ultralytics Forums" src="https://img.shields.io/discourse/users?server=https%3A%2F%2Fcommunity.ultralytics.com&logo=discourse&label=Forums&color=blue"></a>
-    <a href="https://www.reddit.com/r/ultralytics/"><img alt="Ultralytics Reddit" src="https://img.shields.io/reddit/subreddit-subscribers/ultralytics?style=flat&logo=reddit&logoColor=white&label=Reddit&color=blue"></a>
-    <br>
-    <a href="https://console.paperspace.com/github/ultralytics/ultralytics"><img src="https://assets.paperspace.io/img/gradient-badge.svg" alt="Run Ultralytics on Gradient"></a>
-    <a href="https://colab.research.google.com/github/ultralytics/ultralytics/blob/main/examples/tutorial.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open Ultralytics In Colab"></a>
-    <a href="https://www.kaggle.com/models/ultralytics/yolo11"><img src="https://kaggle.com/static/images/open-in-kaggle.svg" alt="Open Ultralytics In Kaggle"></a>
-    <a href="https://mybinder.org/v2/gh/ultralytics/ultralytics/HEAD?labpath=examples%2Ftutorial.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt="Open Ultralytics In Binder"></a>
-</div>
-</div>
-<br>
+The goal is that **anyone can understand and reproduce the project using this README alone**.
 
-[Ultralytics](https://www.ultralytics.com/) creates cutting-edge, state-of-the-art (SOTA) [YOLO models](https://www.ultralytics.com/yolo) built on years of foundational research in computer vision and AI. Constantly updated for performance and flexibility, our models are **fast**, **accurate**, and **easy to use**. They excel at [object detection](https://docs.ultralytics.com/tasks/detect/), [tracking](https://docs.ultralytics.com/modes/track/), [instance segmentation](https://docs.ultralytics.com/tasks/segment/), [image classification](https://docs.ultralytics.com/tasks/classify/), and [pose estimation](https://docs.ultralytics.com/tasks/pose/) tasks.
+> Custom model reference implementation (original work):
+> https://github.com/Umar-Farooq-2112/ultralytics-custom-timber-defect-model.git
 
-Find detailed documentation in the [Ultralytics Docs](https://docs.ultralytics.com/). Get support via [GitHub Issues](https://github.com/ultralytics/ultralytics/issues/new/choose). Join discussions on [Discord](https://discord.com/invite/ultralytics), [Reddit](https://www.reddit.com/r/ultralytics/), and the [Ultralytics Community Forums](https://community.ultralytics.com/)!
+---
 
-Request an Enterprise License for commercial use at [Ultralytics Licensing](https://www.ultralytics.com/license).
+## 1. Problem Statement and Goals
 
-<a href="https://docs.ultralytics.com/models/yolo11/" target="_blank">
-  <img width="100%" src="https://raw.githubusercontent.com/ultralytics/assets/refs/heads/main/yolo/performance-comparison.png" alt="YOLO11 performance plots">
-</a>
+Wooden boards used in construction and furniture often contain **defects** such as cracks, knots, or surface damage.
+These defects affect strength, safety, and appearance. Manually inspecting every board is:
 
-<div align="center">
-  <a href="https://github.com/ultralytics"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-github.png" width="2%" alt="Ultralytics GitHub"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="2%" alt="space">
-  <a href="https://www.linkedin.com/company/ultralytics/"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-linkedin.png" width="2%" alt="Ultralytics LinkedIn"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="2%" alt="space">
-  <a href="https://twitter.com/ultralytics"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-twitter.png" width="2%" alt="Ultralytics Twitter"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="2%" alt="space">
-  <a href="https://www.youtube.com/ultralytics?sub_confirmation=1"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-youtube.png" width="2%" alt="Ultralytics YouTube"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="2%" alt="space">
-  <a href="https://www.tiktok.com/@ultralytics"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-tiktok.png" width="2%" alt="Ultralytics TikTok"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="2%" alt="space">
-  <a href="https://ultralytics.com/bilibili"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-bilibili.png" width="2%" alt="Ultralytics BiliBili"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="2%" alt="space">
-  <a href="https://discord.com/invite/ultralytics"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-discord.png" width="2%" alt="Ultralytics Discord"></a>
-</div>
+- **Slow** – inspectors must visually scan large surfaces.
+- **Subjective** – defect severity can be judged differently by different people.
+- **Expensive** – especially for high-volume production lines.
 
-## 📄 Documentation
+This project builds an **automated vision system** that:
 
-See below for quickstart installation and usage examples. For comprehensive guidance on training, validation, prediction, and deployment, refer to our full [Ultralytics Docs](https://docs.ultralytics.com/).
+- Takes an **RGB image of a timber board** as input.
+- Outputs **bounding boxes around visible defects** with class labels and confidence scores.
+- Is **lightweight enough** to run on limited hardware (e.g., edge devices or low-cost GPUs).
 
-<details open>
-<summary>Install</summary>
+The end result is a deployable model that can be integrated into a factory pipeline for **automatic timber defect
+localization**.
 
-Install the `ultralytics` package, including all [requirements](https://github.com/ultralytics/ultralytics/blob/main/pyproject.toml), in a [**Python>=3.8**](https://www.python.org/) environment with [**PyTorch>=1.8**](https://pytorch.org/get-started/locally/).
+---
 
-[![PyPI - Version](https://img.shields.io/pypi/v/ultralytics?logo=pypi&logoColor=white)](https://pypi.org/project/ultralytics/) [![Ultralytics Downloads](https://static.pepy.tech/badge/ultralytics)](https://clickpy.clickhouse.com/dashboard/ultralytics) [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ultralytics?logo=python&logoColor=gold)](https://pypi.org/project/ultralytics/)
+## 2. High‑Level Overview
 
-```bash
-pip install ultralytics
+At a high level, the project consists of:
+
+1. **Dataset & Annotations**
+   - A defect dataset of timber boards (custom dataset, 4 defect classes).
+   - Labels stored in standard YOLO format via a `data.yaml` file.
+
+2. **Custom Detection Model – MobileNetV3‑YOLO**
+   - **Backbone**: `MobileNetV3BackboneDW` (based on MobileNetV3‑Small) with depthwise separable convolutions and
+     attention.
+   - **Neck**: `UltraLiteNeckDW` – an extremely lightweight feature pyramid network with attention, SimSPPF, and a tiny
+     transformer block.
+   - **Head**: Standard Ultralytics YOLO `Detect` head for bounding box regression and classification.
+
+3. **Training & Evaluation**
+   - Training is driven by a custom model YAML:
+     - `ultralytics/cfg/models/custom/mobilenetv3-yolo.yaml` (with `nc: 4`).
+   - Training configuration is stored in:
+     - `training-results/train/args.yaml`.
+   - Training metrics (loss, mAP, precision/recall) are stored in:
+     - `training-results/train/results.csv` and `training-results/train/processed_results.csv`.
+
+4. **Documentation & Notebooks**
+   - `docs/architecture.md` – full model architecture description.
+   - `docs/custom_backbone.md` – details of the MobileNetV3 backbone.
+   - `docs/custom_neck.md` – details of the UltraLite neck.
+   - `docs/training_pipeline.md` – training pipeline settings and rationale.
+   - `docs/results.md` – summarized results and interpretation.
+   - `notebooks/` – placeholders for data augmentation and training visualization.
+
+---
+
+## 3. Repository Structure (Project‑Relevant Parts)
+
+Only the parts directly related to the timber defect project are listed here:
+
+```text
+ultralytics-custom-backbone-neck/
+├─ ultralytics/
+│  ├─ cfg/models/custom/mobilenetv3-yolo.yaml   # Custom model configuration (4 defect classes)
+│  ├─ nn/custom_models.py                       # MobileNetV3YOLO model class
+│  └─ nn/modules/custom_mobilenet_blocks.py     # Backbone and neck building blocks
+│
+├─ docs/
+│  ├─ architecture.md                           # End‑to‑end architecture of MobileNetV3‑YOLO
+│  ├─ custom_backbone.md                        # MobileNetV3BackboneDW design
+│  ├─ custom_neck.md                            # UltraLiteNeckDW design
+│  ├─ training_pipeline.md                      # Training configuration and procedure
+│  └─ results.md                                # Quantitative and qualitative results
+│
+├─ training-results/
+│  └─ train/
+│     ├─ args.yaml                              # Exact hyperparameters used in the final run
+│     ├─ results.csv                            # Raw training metrics per epoch
+│     └─ processed_results.csv                  # Cleaned metrics for analysis/plots
+│
+├─ notebooks/
+│  ├─ data_augnmentation.ipynb                  # To document data augmentation pipeline
+│  ├─ model_training_and_results.ipynb          # To visualize training curves and metrics
+│  └─ sample/                                   # (Optional) Tiny sample data or demos
+│
+├─ best.pt                                      # Best performing checkpoint (validation‑based)
+├─ last.pt                                      # Last checkpoint from the recorded training run
+└─ README.md                                    # You are here
 ```
 
-For alternative installation methods, including [Conda](https://anaconda.org/conda-forge/ultralytics), [Docker](https://hub.docker.com/r/ultralytics/ultralytics), and building from source via Git, please consult the [Quickstart Guide](https://docs.ultralytics.com/quickstart/).
+Other files and folders belong to the upstream Ultralytics framework (data loaders, generic models, training engine
+etc.). They are used as a base but are not the main focus of this project description.
 
-[![Conda Version](https://img.shields.io/conda/vn/conda-forge/ultralytics?logo=condaforge)](https://anaconda.org/conda-forge/ultralytics) [![Docker Image Version](https://img.shields.io/docker/v/ultralytics/ultralytics?sort=semver&logo=docker)](https://hub.docker.com/r/ultralytics/ultralytics) [![Ultralytics Docker Pulls](https://img.shields.io/docker/pulls/ultralytics/ultralytics?logo=docker)](https://hub.docker.com/r/ultralytics/ultralytics)
+---
 
-</details>
+## 4. Dataset and Labels
 
-<details open>
-<summary>Usage</summary>
+### 4.1. Dataset
 
-### CLI
+The project uses a **custom timber defect dataset** described via a standard Ultralytics `data.yaml` file. In the
+recorded experiments, the dataset is referenced as:
 
-You can use Ultralytics YOLO directly from the Command Line Interface (CLI) with the `yolo` command:
-
-```bash
-# Predict using a pretrained YOLO model (e.g., YOLO11n) on an image
-yolo predict model=yolo11n.pt source='https://ultralytics.com/images/bus.jpg'
+```text
+defects-in-timber/data.yaml
 ```
 
-The `yolo` command supports various tasks and modes, accepting additional arguments like `imgsz=640`. Explore the YOLO [CLI Docs](https://docs.ultralytics.com/usage/cli/) for more examples.
+This file defines:
 
-### Python
+- Paths to **training**, **validation**, and (optionally) **test** image folders.
+- A list of **4 defect classes** (e.g., cracks, knots, surface anomalies – exact names depend on your dataset).
+- Any dataset‑specific metadata.
 
-Ultralytics YOLO can also be integrated directly into your Python projects. It accepts the same [configuration arguments](https://docs.ultralytics.com/usage/cfg/) as the CLI:
+The raw images are photos of timber boards taken under controlled lighting. Each defect is annotated as a **bounding
+box** with a class label.
+
+### 4.2. Annotation Format
+
+Ultralytics (YOLO) uses a standard format:
+
+- Each image has a corresponding `.txt` file with one line per object.
+- Each line contains: `class_id x_center y_center width height` in **normalized** coordinates (values 0–1).
+- Class indices range from `0` to `3` for the four defect types.
+
+The `data.yaml` file tells the training code **where** these images and labels are stored.
+
+---
+
+## 5. Model Architecture – MobileNetV3‑YOLO
+
+The model follows a standard YOLO design (backbone → neck → detection head) but is heavily optimized for **lightweight
+inference** and **small defect localization**.
+
+### 5.1. Backbone – MobileNetV3BackboneDW
+
+Defined in: `ultralytics/nn/modules/custom_mobilenet_blocks.py` and wired in via `MobileNetV3YOLO`.
+
+Main ideas:
+
+- **Base network**: `mobilenet_v3_small` from `torchvision`.
+- The network is sliced into stages to produce 3 main feature maps:
+  - `P3` at stride 8 (high resolution, good for small defects).
+  - `P4` at stride 16.
+  - `P5` at stride 32.
+- Custom **depthwise separable convolution blocks** (`DWConvCustom`) are used to reduce parameters and FLOPs.
+- A **CBAM‑like attention module** (channel attention) is added to improve feature quality for defect regions.
+
+Why this backbone?
+
+- MobileNetV3‑Small is already optimized for mobile/edge hardware.
+- Adding depthwise blocks and attention improves performance on difficult, small, low‑contrast defects while keeping
+  the model compact.
+
+### 5.2. Neck – UltraLiteNeckDW
+
+Defined in: `ultralytics/nn/modules/custom_mobilenet_blocks.py`.
+
+The neck combines features from P3, P4, and P5 and prepares them for detection:
+
+- Uses **depthwise separable convolutions** throughout to keep computation low.
+- Incorporates **SimSPPF** (a simplified spatial pyramid pooling) to capture multi‑scale context.
+- Adds a small **transformer block on the P5 layer** to model long‑range dependencies across the board.
+- Applies **channel attention** to emphasize informative channels.
+
+Outputs of the neck are 3 feature maps (for small, medium, and large objects) that are fed into the YOLO `Detect` head.
+
+### 5.3. Detection Head – YOLO `Detect`
+
+The head is the standard Ultralytics YOLO detection head:
+
+- For each scale (P3, P4, P5), it predicts:
+  - Bounding box coordinates (using a Distribution Focal Loss‑based representation).
+  - Objectness score.
+  - Class probabilities for the 4 defect classes.
+- Loss is computed via Ultralytics' detection loss, handling localization and classification jointly.
+
+### 5.4. Capacity and Efficiency
+
+- Total parameter count is **on the order of ~1.5M parameters** (much smaller than YOLOv8n).
+- Designed to run on modest GPUs and potentially edge devices.
+- Suitable for **real‑time or near real‑time** inspection depending on hardware.
+
+For diagrams and more detailed layer descriptions, see:
+
+- `docs/architecture.md`
+- `docs/custom_backbone.md`
+- `docs/custom_neck.md`
+
+---
+
+## 6. Training Configuration
+
+All training hyperparameters for the main experiment are stored in:
+
+- `training-results/train/args.yaml`
+
+Key settings from this file:
+
+- **Task**: `detect`
+- **Model config**: `ultralytics/cfg/models/custom/mobilenetv3-yolo.yaml`
+- **Data config**: `defects-in-timber/data.yaml`
+- **Classes**: 4
+- **Image size**: `imgsz = 640`
+- **Batch size**: `batch = 16`
+- **Epochs**: configured for `epochs = 500`
+- **Early stopping**: `patience = 25` (training stops early if validation does not improve)
+- **Optimizer**: SGD with typical YOLOv8 defaults (initial learning rate, momentum, weight decay, etc.).
+- **Augmentations**: standard Ultralytics augmentations (random scaling, flipping, color jitter, mosaic/mixup depending
+  on the exact version).
+
+These parameters make the training **stable** while allowing the model enough capacity to learn subtle texture
+differences on wood.
+
+For a narrative explanation of the pipeline, see `docs/training_pipeline.md`.
+
+---
+
+## 7. Training Results
+
+The detailed per‑epoch metrics are logged in:
+
+- `training-results/train/results.csv` (raw Ultralytics log)
+- `training-results/train/processed_results.csv` (cleaned version for analysis)
+
+The recorded training run logs **114 epochs** (with configuration set to a maximum of 500 epochs and early stopping).
+
+From these logs (see `docs/results.md` for plots and interpretation):
+
+- **Best mAP50 (bounding box)**: ≈ **0.79** (around epoch ~106)
+- **Best mAP50‑95 (bounding box)**: ≈ **0.46**
+- **Precision**: grows from ~0.38 in early epochs to the **mid‑0.7 range** for the best checkpoint
+- **Recall**: stabilizes around **0.77–0.78**
+
+Checkpoint files:
+
+- `best.pt` – model with best validation performance.
+- `last.pt` – model from the final logged epoch (useful for continued training or analysis).
+
+These results show that the custom MobileNetV3‑YOLO successfully learns to detect multiple defect types with solid
+precision and recall, while remaining much smaller than standard YOLO variants.
+
+---
+
+## 8. How to Run This Project
+
+This section explains **exactly how to install, train, and run inference** using this repository.
+
+### 8.1. Requirements
+
+- Python >= 3.8
+- PyTorch with CUDA support (if you want GPU training)
+- Git
+
+### 8.2. Installation (Editable Mode)
+
+1. Clone this repository:
+
+   ```bash
+   git clone <this-repo-url>
+   cd ultralytics-custom-backbone-neck
+   ```
+
+2. Create and activate a virtual environment (recommended) and install dependencies:
+
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate  # on Windows
+
+   pip install --upgrade pip
+   pip install -e .
+   ```
+
+   This installs the `ultralytics` package from this repo, including the custom MobileNetV3‑YOLO model.
+
+### 8.3. Prepare the Dataset
+
+1. Place your timber defect images and labels in a folder structure compatible with Ultralytics YOLO.
+2. Create or adapt a `data.yaml` similar to the one used in experiments:
+
+   ```yaml
+   path: path/to/defects-in-timber
+   train: images/train
+   val: images/val
+   test: images/test  # optional
+
+   names:
+     0: class_0
+     1: class_1
+     2: class_2
+     3: class_3
+   ```
+
+   Replace `class_0`–`class_3` with your actual defect names.
+
+Update `training-results/train/args.yaml` or simply pass your data path on the command line.
+
+### 8.4. Training from Scratch
+
+Once dependencies and dataset are ready, train the model using the `yolo` CLI:
+
+```bash
+yolo detect train \
+  model=ultralytics/cfg/models/custom/mobilenetv3-yolo.yaml \
+  data=defects-in-timber/data.yaml \
+  imgsz=640 \
+  batch=16 \
+  epochs=500 \
+  patience=25
+```
+
+During training, Ultralytics will automatically create a new run directory (e.g., `runs/detect/trainX/`) with logs,
+plots, and checkpoints. The run used in this README is also summarized under `training-results/train/`.
+
+### 8.5. Evaluating a Trained Model
+
+To evaluate an existing checkpoint (for example, `best.pt`):
+
+```bash
+yolo detect val \
+  model=best.pt \
+  data=defects-in-timber/data.yaml \
+  imgsz=640
+```
+
+This reports mAP, precision, recall, and other metrics on the validation set.
+
+### 8.6. Running Inference on New Images
+
+To run inference on one or more images of timber boards:
+
+```bash
+yolo detect predict \
+  model=best.pt \
+  source=path/to/your/images \
+  imgsz=640 \
+  conf=0.25
+```
+
+Ultralytics will create a `runs/detect/predictX/` folder containing images with **bounding boxes and labels drawn on
+detected defects**.
+
+### 8.7. Using the Model in Python
+
+You can also integrate the trained model directly in Python code:
 
 ```python
 from ultralytics import YOLO
 
-# Load a pretrained YOLO11n model
-model = YOLO("yolo11n.pt")
+# Load a trained timber defect model
+model = YOLO("best.pt")
 
-# Train the model on the COCO8 dataset for 100 epochs
-train_results = model.train(
-    data="coco8.yaml",  # Path to dataset configuration file
-    epochs=100,  # Number of training epochs
-    imgsz=640,  # Image size for training
-    device="cpu",  # Device to run on (e.g., 'cpu', 0, [0,1,2,3])
-)
+# Run prediction on a single image
+results = model("path/to/board.jpg")
 
-# Evaluate the model's performance on the validation set
-metrics = model.val()
-
-# Perform object detection on an image
-results = model("path/to/image.jpg")  # Predict on an image
-results[0].show()  # Display results
-
-# Export the model to ONNX format for deployment
-path = model.export(format="onnx")  # Returns the path to the exported model
+# Visualize
+results[0].show()             # show in a window
+results[0].save("out.jpg")   # save visualization
 ```
 
-Discover more examples in the YOLO [Python Docs](https://docs.ultralytics.com/usage/python/).
+---
 
-</details>
+## 9. Notebooks and Analysis
 
-## ✨ Models
+Two notebooks are provided as **templates** to turn this project into a fully documented experiment:
 
-Ultralytics supports a wide range of YOLO models, from early versions like [YOLOv3](https://docs.ultralytics.com/models/yolov3/) to the latest [YOLO11](https://docs.ultralytics.com/models/yolo11/). The tables below showcase YOLO11 models pretrained on the [COCO](https://docs.ultralytics.com/datasets/detect/coco/) dataset for [Detection](https://docs.ultralytics.com/tasks/detect/), [Segmentation](https://docs.ultralytics.com/tasks/segment/), and [Pose Estimation](https://docs.ultralytics.com/tasks/pose/). Additionally, [Classification](https://docs.ultralytics.com/tasks/classify/) models pretrained on the [ImageNet](https://docs.ultralytics.com/datasets/classify/imagenet/) dataset are available. [Tracking](https://docs.ultralytics.com/modes/track/) mode is compatible with all Detection, Segmentation, and Pose models. All [Models](https://docs.ultralytics.com/models/) are automatically downloaded from the latest Ultralytics [release](https://github.com/ultralytics/assets/releases) upon first use.
+- `notebooks/data_augnmentation.ipynb`
+  - Document and visualize the data augmentation pipeline.
+  - Show example before/after images.
 
-<a href="https://docs.ultralytics.com/tasks/" target="_blank">
-    <img width="100%" src="https://github.com/ultralytics/docs/releases/download/0/ultralytics-yolov8-tasks-banner.avif" alt="Ultralytics YOLO supported tasks">
-</a>
-<br>
-<br>
+- `notebooks/model_training_and_results.ipynb`
+  - Load `training-results/train/processed_results.csv`.
+  - Plot loss, mAP, precision, and recall curves.
+  - Compare different runs if you perform further experiments.
 
-<details open><summary>Detection (COCO)</summary>
+You can adapt these notebooks to your own environment and dataset paths.
 
-Explore the [Detection Docs](https://docs.ultralytics.com/tasks/detect/) for usage examples. These models are trained on the [COCO dataset](https://cocodataset.org/), featuring 80 object classes.
+---
 
-| Model                                                                                | size<br><sup>(pixels) | mAP<sup>val<br>50-95 | Speed<br><sup>CPU ONNX<br>(ms) | Speed<br><sup>T4 TensorRT10<br>(ms) | params<br><sup>(M) | FLOPs<br><sup>(B) |
-| ------------------------------------------------------------------------------------ | --------------------- | -------------------- | ------------------------------ | ----------------------------------- | ------------------ | ----------------- |
-| [YOLO11n](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n.pt) | 640                   | 39.5                 | 56.1 ± 0.8                     | 1.5 ± 0.0                           | 2.6                | 6.5               |
-| [YOLO11s](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s.pt) | 640                   | 47.0                 | 90.0 ± 1.2                     | 2.5 ± 0.0                           | 9.4                | 21.5              |
-| [YOLO11m](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11m.pt) | 640                   | 51.5                 | 183.2 ± 2.0                    | 4.7 ± 0.1                           | 20.1               | 68.0              |
-| [YOLO11l](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l.pt) | 640                   | 53.4                 | 238.6 ± 1.4                    | 6.2 ± 0.1                           | 25.3               | 86.9              |
-| [YOLO11x](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11x.pt) | 640                   | 54.7                 | 462.8 ± 6.7                    | 11.3 ± 0.2                          | 56.9               | 194.9             |
+## 10. Why This Approach Works Well for Timber Defects
 
-- **mAP<sup>val</sup>** values refer to single-model single-scale performance on the [COCO val2017](https://cocodataset.org/) dataset. See [YOLO Performance Metrics](https://docs.ultralytics.com/guides/yolo-performance-metrics/) for details. <br>Reproduce with `yolo val detect data=coco.yaml device=0`
-- **Speed** metrics are averaged over COCO val images using an [Amazon EC2 P4d](https://aws.amazon.com/ec2/instance-types/p4/) instance. CPU speeds measured with [ONNX](https://onnx.ai/) export. GPU speeds measured with [TensorRT](https://developer.nvidia.com/tensorrt) export. <br>Reproduce with `yolo val detect data=coco.yaml batch=1 device=0|cpu`
+1. **Small, localized defects**
+   - Many defects are small relative to the entire board.
+   - The strong P3 (stride 8) path and attention modules help retain high‑resolution detail.
 
-</details>
+2. **Lightweight but expressive backbone**
+   - MobileNetV3‑Small is compact yet expressive.
+   - Depthwise convolutions make it feasible for real‑time use.
 
-<details><summary>Segmentation (COCO)</summary>
+3. **Context through the neck**
+   - SimSPPF and the tiny transformer on P5 give the model enough global context to distinguish real defects from
+     harmless texture.
 
-Refer to the [Segmentation Docs](https://docs.ultralytics.com/tasks/segment/) for usage examples. These models are trained on [COCO-Seg](https://docs.ultralytics.com/datasets/segment/coco/), including 80 classes.
+4. **Stable training pipeline**
+   - Standard Ultralytics training loop, optimizer, and augmentations.
+   - Easy to reproduce and extend with new experiments.
 
-| Model                                                                                        | size<br><sup>(pixels) | mAP<sup>box<br>50-95 | mAP<sup>mask<br>50-95 | Speed<br><sup>CPU ONNX<br>(ms) | Speed<br><sup>T4 TensorRT10<br>(ms) | params<br><sup>(M) | FLOPs<br><sup>(B) |
-| -------------------------------------------------------------------------------------------- | --------------------- | -------------------- | --------------------- | ------------------------------ | ----------------------------------- | ------------------ | ----------------- |
-| [YOLO11n-seg](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-seg.pt) | 640                   | 38.9                 | 32.0                  | 65.9 ± 1.1                     | 1.8 ± 0.0                           | 2.9                | 9.7               |
-| [YOLO11s-seg](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-seg.pt) | 640                   | 46.6                 | 37.8                  | 117.6 ± 4.9                    | 2.9 ± 0.0                           | 10.1               | 33.0              |
-| [YOLO11m-seg](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11m-seg.pt) | 640                   | 51.5                 | 41.5                  | 281.6 ± 1.2                    | 6.3 ± 0.1                           | 22.4               | 113.2             |
-| [YOLO11l-seg](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l-seg.pt) | 640                   | 53.4                 | 42.9                  | 344.2 ± 3.2                    | 7.8 ± 0.2                           | 27.6               | 132.2             |
-| [YOLO11x-seg](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11x-seg.pt) | 640                   | 54.7                 | 43.8                  | 664.5 ± 3.2                    | 15.8 ± 0.7                          | 62.1               | 296.4             |
+---
 
-- **mAP<sup>val</sup>** values are for single-model single-scale on the [COCO val2017](https://cocodataset.org/) dataset. See [YOLO Performance Metrics](https://docs.ultralytics.com/guides/yolo-performance-metrics/) for details. <br>Reproduce with `yolo val segment data=coco.yaml device=0`
-- **Speed** metrics are averaged over COCO val images using an [Amazon EC2 P4d](https://aws.amazon.com/ec2/instance-types/p4/) instance. CPU speeds measured with [ONNX](https://onnx.ai/) export. GPU speeds measured with [TensorRT](https://developer.nvidia.com/tensorrt) export. <br>Reproduce with `yolo val segment data=coco.yaml batch=1 device=0|cpu`
+## 11. Extending the Project
 
-</details>
+Ideas for future work:
 
-<details><summary>Classification (ImageNet)</summary>
+- **Per‑defect severity scoring**: add regression heads or additional outputs to estimate severity or size.
+- **Segmentation**: extend the model to instance or semantic segmentation of defect regions.
+- **Active learning**: use model uncertainty to propose new images for labeling.
+- **Edge deployment**: export to ONNX, TensorRT, or other formats and deploy on embedded devices.
 
-Consult the [Classification Docs](https://docs.ultralytics.com/tasks/classify/) for usage examples. These models are trained on [ImageNet](https://docs.ultralytics.com/datasets/classify/imagenet/), covering 1000 classes.
+The existing codebase and configuration files already follow the Ultralytics ecosystem, so most extensions can reuse
+their tooling.
 
-| Model                                                                                        | size<br><sup>(pixels) | acc<br><sup>top1 | acc<br><sup>top5 | Speed<br><sup>CPU ONNX<br>(ms) | Speed<br><sup>T4 TensorRT10<br>(ms) | params<br><sup>(M) | FLOPs<br><sup>(B) at 224 |
-| -------------------------------------------------------------------------------------------- | --------------------- | ---------------- | ---------------- | ------------------------------ | ----------------------------------- | ------------------ | ------------------------ |
-| [YOLO11n-cls](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-cls.pt) | 224                   | 70.0             | 89.4             | 5.0 ± 0.3                      | 1.1 ± 0.0                           | 2.8                | 0.5                      |
-| [YOLO11s-cls](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-cls.pt) | 224                   | 75.4             | 92.7             | 7.9 ± 0.2                      | 1.3 ± 0.0                           | 6.7                | 1.6                      |
-| [YOLO11m-cls](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11m-cls.pt) | 224                   | 77.3             | 93.9             | 17.2 ± 0.4                     | 2.0 ± 0.0                           | 11.6               | 4.9                      |
-| [YOLO11l-cls](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l-cls.pt) | 224                   | 78.3             | 94.3             | 23.2 ± 0.3                     | 2.8 ± 0.0                           | 14.1               | 6.2                      |
-| [YOLO11x-cls](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11x-cls.pt) | 224                   | 79.5             | 94.9             | 41.4 ± 0.9                     | 3.8 ± 0.0                           | 29.6               | 13.6                     |
+---
 
-- **acc** values represent model accuracy on the [ImageNet](https://www.image-net.org/) dataset validation set. <br>Reproduce with `yolo val classify data=path/to/ImageNet device=0`
-- **Speed** metrics are averaged over ImageNet val images using an [Amazon EC2 P4d](https://aws.amazon.com/ec2/instance-types/p4/) instance. CPU speeds measured with [ONNX](https://onnx.ai/) export. GPU speeds measured with [TensorRT](https://developer.nvidia.com/tensorrt) export. <br>Reproduce with `yolo val classify data=path/to/ImageNet batch=1 device=0|cpu`
+## 12. License and Acknowledgements
 
-</details>
+- The core training framework and many utilities come from the **Ultralytics YOLO** project.
+- This repository adds a custom backbone, neck, and configuration for the **timber defect localization** use case.
 
-<details><summary>Pose (COCO)</summary>
+Please see the [LICENSE](LICENSE) file for full licensing details.
 
-See the [Pose Estimation Docs](https://docs.ultralytics.com/tasks/pose/) for usage examples. These models are trained on [COCO-Pose](https://docs.ultralytics.com/datasets/pose/coco/), focusing on the 'person' class.
+If you use this work in academic research, consider citing both the Ultralytics YOLO paper and your own thesis/paper
+that describes the timber defect model.
 
-| Model                                                                                          | size<br><sup>(pixels) | mAP<sup>pose<br>50-95 | mAP<sup>pose<br>50 | Speed<br><sup>CPU ONNX<br>(ms) | Speed<br><sup>T4 TensorRT10<br>(ms) | params<br><sup>(M) | FLOPs<br><sup>(B) |
-| ---------------------------------------------------------------------------------------------- | --------------------- | --------------------- | ------------------ | ------------------------------ | ----------------------------------- | ------------------ | ----------------- |
-| [YOLO11n-pose](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-pose.pt) | 640                   | 50.0                  | 81.0               | 52.4 ± 0.5                     | 1.7 ± 0.0                           | 2.9                | 7.4               |
-| [YOLO11s-pose](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-pose.pt) | 640                   | 58.9                  | 86.3               | 90.5 ± 0.6                     | 2.6 ± 0.0                           | 9.9                | 23.1              |
-| [YOLO11m-pose](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11m-pose.pt) | 640                   | 64.9                  | 89.4               | 187.3 ± 0.8                    | 4.9 ± 0.1                           | 20.9               | 71.4              |
-| [YOLO11l-pose](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l-pose.pt) | 640                   | 66.1                  | 89.9               | 247.7 ± 1.1                    | 6.4 ± 0.1                           | 26.1               | 90.3              |
-| [YOLO11x-pose](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11x-pose.pt) | 640                   | 69.5                  | 91.1               | 488.0 ± 13.9                   | 12.1 ± 0.2                          | 58.8               | 202.8             |
+---
 
-- **mAP<sup>val</sup>** values are for single-model single-scale on the [COCO Keypoints val2017](https://docs.ultralytics.com/datasets/pose/coco/) dataset. See [YOLO Performance Metrics](https://docs.ultralytics.com/guides/yolo-performance-metrics/) for details. <br>Reproduce with `yolo val pose data=coco-pose.yaml device=0`
-- **Speed** metrics are averaged over COCO val images using an [Amazon EC2 P4d](https://aws.amazon.com/ec2/instance-types/p4/) instance. CPU speeds measured with [ONNX](https://onnx.ai/) export. GPU speeds measured with [TensorRT](https://developer.nvidia.com/tensorrt) export. <br>Reproduce with `yolo val pose data=coco-pose.yaml batch=1 device=0|cpu`
+## 13. Contact
 
-</details>
+For questions about **this timber defect project** (model design, training configuration, or results), please refer to
+the documentation in the `docs/` folder or to the original custom model repository:
 
-<details><summary>Oriented Bounding Boxes (DOTAv1)</summary>
+- https://github.com/Umar-Farooq-2112/ultralytics-custom-timber-defect-model.git
 
-Check the [OBB Docs](https://docs.ultralytics.com/tasks/obb/) for usage examples. These models are trained on [DOTAv1](https://docs.ultralytics.com/datasets/obb/dota-v2/#dota-v10/), including 15 classes.
+You can also consult the official Ultralytics documentation for general YOLO usage patterns and advanced deployment
+options.
 
-| Model                                                                                        | size<br><sup>(pixels) | mAP<sup>test<br>50 | Speed<br><sup>CPU ONNX<br>(ms) | Speed<br><sup>T4 TensorRT10<br>(ms) | params<br><sup>(M) | FLOPs<br><sup>(B) |
-| -------------------------------------------------------------------------------------------- | --------------------- | ------------------ | ------------------------------ | ----------------------------------- | ------------------ | ----------------- |
-| [YOLO11n-obb](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-obb.pt) | 1024                  | 78.4               | 117.6 ± 0.8                    | 4.4 ± 0.0                           | 2.7                | 16.8              |
-| [YOLO11s-obb](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-obb.pt) | 1024                  | 79.5               | 219.4 ± 4.0                    | 5.1 ± 0.0                           | 9.7                | 57.1              |
-| [YOLO11m-obb](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11m-obb.pt) | 1024                  | 80.9               | 562.8 ± 2.9                    | 10.1 ± 0.4                          | 20.9               | 182.8             |
-| [YOLO11l-obb](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l-obb.pt) | 1024                  | 81.0               | 712.5 ± 5.0                    | 13.5 ± 0.6                          | 26.1               | 231.2             |
-| [YOLO11x-obb](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11x-obb.pt) | 1024                  | 81.3               | 1408.6 ± 7.7                   | 28.6 ± 1.0                          | 58.8               | 519.1             |
-
-- **mAP<sup>test</sup>** values are for single-model multiscale performance on the [DOTAv1 test set](https://captain-whu.github.io/DOTA/dataset.html). <br>Reproduce by `yolo val obb data=DOTAv1.yaml device=0 split=test` and submit merged results to the [DOTA evaluation server](https://captain-whu.github.io/DOTA/evaluation.html).
-- **Speed** metrics are averaged over [DOTAv1 val images](https://docs.ultralytics.com/datasets/obb/dota-v2/#dota-v10) using an [Amazon EC2 P4d](https://aws.amazon.com/ec2/instance-types/p4/) instance. CPU speeds measured with [ONNX](https://onnx.ai/) export. GPU speeds measured with [TensorRT](https://developer.nvidia.com/tensorrt) export. <br>Reproduce by `yolo val obb data=DOTAv1.yaml batch=1 device=0|cpu`
-
-</details>
-
-## 🧩 Integrations
-
-Our key integrations with leading AI platforms extend the functionality of Ultralytics' offerings, enhancing tasks like dataset labeling, training, visualization, and model management. Discover how Ultralytics, in collaboration with partners like [Weights & Biases](https://docs.ultralytics.com/integrations/weights-biases/), [Comet ML](https://docs.ultralytics.com/integrations/comet/), [Roboflow](https://docs.ultralytics.com/integrations/roboflow/), and [Intel OpenVINO](https://docs.ultralytics.com/integrations/openvino/), can optimize your AI workflow. Explore more at [Ultralytics Integrations](https://docs.ultralytics.com/integrations/).
-
-<a href="https://docs.ultralytics.com/integrations/" target="_blank">
-    <img width="100%" src="https://github.com/ultralytics/assets/raw/main/yolov8/banner-integrations.png" alt="Ultralytics active learning integrations">
-</a>
-<br>
-<br>
-
-<div align="center">
-  <a href="https://www.ultralytics.com/hub">
-    <img src="https://github.com/ultralytics/assets/raw/main/partners/logo-ultralytics-hub.png" width="10%" alt="Ultralytics HUB logo"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="15%" height="0" alt="space">
-  <a href="https://docs.ultralytics.com/integrations/weights-biases/">
-    <img src="https://github.com/ultralytics/assets/raw/main/partners/logo-wb.png" width="10%" alt="Weights & Biases logo"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="15%" height="0" alt="space">
-  <a href="https://docs.ultralytics.com/integrations/comet/">
-    <img src="https://github.com/ultralytics/assets/raw/main/partners/logo-comet.png" width="10%" alt="Comet ML logo"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="15%" height="0" alt="space">
-  <a href="https://docs.ultralytics.com/integrations/neural-magic/">
-    <img src="https://github.com/ultralytics/assets/raw/main/partners/logo-neuralmagic.png" width="10%" alt="Neural Magic logo"></a>
-</div>
-
-|                                                       Ultralytics HUB 🌟                                                        |                                                          Weights & Biases                                                           |                                                                              Comet                                                                              |                                                        Neural Magic                                                         |
-| :-----------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------: |
-| Streamline YOLO workflows: Label, train, and deploy effortlessly with [Ultralytics HUB](https://hub.ultralytics.com/). Try now! | Track experiments, hyperparameters, and results with [Weights & Biases](https://docs.ultralytics.com/integrations/weights-biases/). | Free forever, [Comet ML](https://docs.ultralytics.com/integrations/comet/) lets you save YOLO models, resume training, and interactively visualize predictions. | Run YOLO inference up to 6x faster with [Neural Magic DeepSparse](https://docs.ultralytics.com/integrations/neural-magic/). |
-
-## 🌟 Ultralytics HUB
-
-Experience seamless AI with [Ultralytics HUB](https://hub.ultralytics.com/), the all-in-one platform for data visualization, training YOLO models, and deployment—no coding required. Transform images into actionable insights and bring your AI visions to life effortlessly using our cutting-edge platform and user-friendly [Ultralytics App](https://www.ultralytics.com/app-install). Start your journey for **Free** today!
-
-<a href="https://www.ultralytics.com/hub" target="_blank">
-<img width="100%" src="https://github.com/ultralytics/assets/raw/main/im/ultralytics-hub.png" alt="Ultralytics HUB preview image"></a>
-
-## 🤝 Contribute
-
-We thrive on community collaboration! Ultralytics YOLO wouldn't be the SOTA framework it is without contributions from developers like you. Please see our [Contributing Guide](https://docs.ultralytics.com/help/contributing/) to get started. We also welcome your feedback—share your experience by completing our [Survey](https://www.ultralytics.com/survey?utm_source=github&utm_medium=social&utm_campaign=Survey). A huge **Thank You** 🙏 to everyone who contributes!
-
-<!-- SVG image from https://opencollective.com/ultralytics/contributors.svg?width=1280 -->
-
-[![Ultralytics open-source contributors](https://raw.githubusercontent.com/ultralytics/assets/main/im/image-contributors.png)](https://github.com/ultralytics/ultralytics/graphs/contributors)
-
-We look forward to your contributions to help make the Ultralytics ecosystem even better!
-
-## 📜 License
-
-Ultralytics offers two licensing options to suit different needs:
-
-- **AGPL-3.0 License**: This [OSI-approved](https://opensource.org/license/agpl-v3) open-source license is perfect for students, researchers, and enthusiasts. It encourages open collaboration and knowledge sharing. See the [LICENSE](https://github.com/ultralytics/ultralytics/blob/main/LICENSE) file for full details.
-- **Ultralytics Enterprise License**: Designed for commercial use, this license allows for the seamless integration of Ultralytics software and AI models into commercial products and services, bypassing the open-source requirements of AGPL-3.0. If your use case involves commercial deployment, please contact us via [Ultralytics Licensing](https://www.ultralytics.com/license).
-
-## 📞 Contact
-
-For bug reports and feature requests related to Ultralytics software, please visit [GitHub Issues](https://github.com/ultralytics/ultralytics/issues). For questions, discussions, and community support, join our active communities on [Discord](https://discord.com/invite/ultralytics), [Reddit](https://www.reddit.com/r/ultralytics/), and the [Ultralytics Community Forums](https://community.ultralytics.com/). We're here to help with all things Ultralytics!
-
-<br>
-<div align="center">
-  <a href="https://github.com/ultralytics"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-github.png" width="3%" alt="Ultralytics GitHub"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="3%" alt="space">
-  <a href="https://www.linkedin.com/company/ultralytics/"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-linkedin.png" width="3%" alt="Ultralytics LinkedIn"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="3%" alt="space">
-  <a href="https://twitter.com/ultralytics"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-twitter.png" width="3%" alt="Ultralytics Twitter"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="3%" alt="space">
-  <a href="https://www.youtube.com/ultralytics?sub_confirmation=1"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-youtube.png" width="3%" alt="Ultralytics YouTube"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="3%" alt="space">
-  <a href="https://www.tiktok.com/@ultralytics"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-tiktok.png" width="3%" alt="Ultralytics TikTok"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="3%" alt="space">
-  <a href="https://ultralytics.com/bilibili"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-bilibili.png" width="3%" alt="Ultralytics BiliBili"></a>
-  <img src="https://github.com/ultralytics/assets/raw/main/social/logo-transparent.png" width="3%" alt="space">
-  <a href="https://discord.com/invite/ultralytics"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-discord.png" width="3%" alt="Ultralytics Discord"></a>
-</div>
